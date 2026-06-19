@@ -368,7 +368,7 @@
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
             let pos1 = coin1Heads ? "左" : "右";
-            let pos2 = coin2Heads ? "left" ? "左" : "右";
+            let pos2 = coin2Heads ? "左" : "右"; // 修正後的第 371 行
             const resultBox = document.getElementById('result-purple');
             resultBox.innerHTML = `
                 <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
@@ -385,7 +385,6 @@
         let isPaused = false; 
         let currentMode = 'random'; 
         
-        // 核心修改：建立單一全域聲音引擎，用來繞過手機瀏覽器的靜音封鎖
         let audioCtx = null; 
 
         const display = document.getElementById('display');
@@ -396,7 +395,6 @@
         const inputMin = document.getElementById('input-min');
         const inputSec = document.getElementById('input-sec');
 
-        // 初始化/解鎖手機聲音引擎
         function initAudio() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -404,7 +402,6 @@
                     audioCtx = new AudioContext();
                 }
             }
-            // 如果引擎處於掛起狀態（手機常見保護機制），將其喚醒
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -536,7 +533,6 @@
             if (totalSeconds <= 0) return;
             if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
-            // 【核心修正點】只要使用者點擊按鈕，立刻初始化/解鎖手機音效
             initAudio(); 
 
             if (isRunning) {
