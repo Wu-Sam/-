@@ -281,6 +281,41 @@
             font-family: 'Courier New', Courier, monospace;
             box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
+
+        /* 橘球表格專屬樣式 (適應深色背景) */
+        .table-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .cell-head {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .cell-body {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 12px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* 紫球專屬樣式 */
+        .purple-box {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #b794f4;
+            margin-top: 20px;
+            letter-spacing: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -290,6 +325,8 @@
         <select id="lang-select" onchange="changeLanguage()">
             <option value="zh">🇹🇼 中文</option>
             <option value="en">🇺🇸 EN</option>
+            <option value="jp">🇯🇵 日本語</option>
+            <option value="vi">🇻🇳 Tiếng Việt</option>
         </select>
         <button id="sidebar-toggle" onclick="toggleSidebar()" data-i18n="tools">☰ 工具</button>
     </div>
@@ -346,7 +383,7 @@
             'zh': {
                 'title': '溪南國中 - 計時器與硬幣工具',
                 'badge': '🏫 溪南國中',
-                'tools': '☰ 工具',
+                'tools': '☰ 抽籤',
                 'coin-title': '🪙 硬幣擲球',
                 'tab-orange': '🟠 橘球模式',
                 'tab-purple': '🟣 紫球模式',
@@ -364,17 +401,13 @@
                 'btn-resume': '▶️ 繼續',
                 'btn-reset': '🔄 RESET',
                 'time-up': '時間到！',
-                'orange-pos': '橘球位置:',
-                'purple-pos': '紫球位置:',
                 'front': '前',
-                'back': '後',
-                'left': '左',
-                'right': '右'
+                'back': '後'
             },
             'en': {
                 'title': 'Xinan JHS - Timer & Coin Tool',
                 'badge': '🏫 SNJH',
-                'tools': '☰ Tools',
+                'tools': '☰ draw lots',
                 'coin-title': '🪙 Coin Toss',
                 'tab-orange': '🟠 Orange',
                 'tab-purple': '🟣 Purple',
@@ -392,12 +425,56 @@
                 'btn-resume': '▶️ Resume',
                 'btn-reset': '🔄 RESET',
                 'time-up': 'Time\'s Up!',
-                'orange-pos': 'Orange Pos:',
-                'purple-pos': 'Purple Pos:',
-                'front': 'Heads',
-                'back': 'Tails',
-                'left': 'Left',
-                'right': 'Right'
+                'front': 'H',
+                'back': 'T'
+            },
+            'jp': {
+                'title': '渓南中学校 - タイマーとコインツール',
+                'badge': '🏫 渓南中学校',
+                'tools': '☰ くじを引く',
+                'coin-title': '🪙 コイントス',
+                'tab-orange': '🟠 オレンジ',
+                'tab-purple': '🟣 パープル',
+                'btn-toss-orange': 'オレンジを投げる (4枚)',
+                'res-orange-init': '上のボタンをクリックして開始...',
+                'btn-toss-purple': 'パープルを投げる (2枚)',
+                'res-purple-init': '上のボタンをクリックして開始...',
+                'mode-custom': '⚙️ カスタムタイマーに切替',
+                'mode-random': '🎲 ランダムタイマーに切替',
+                'min': '分',
+                'sec': '秒',
+                'btn-draw': '🎲 時間を引く (1~2分)',
+                'btn-start': '▶️ 開始',
+                'btn-pause': '⏸️ 一時停止',
+                'btn-resume': '▶️ 再開',
+                'btn-reset': '🔄 リセット',
+                'time-up': '時間終了！',
+                'front': '表',
+                'back': '裏'
+            },
+            'vi': {
+                'title': 'THCS Khê Nam - Hẹn giờ & Tung đồng xu',
+                'badge': '🏫 SNJH',
+                'tools': '☰ rút thăm',
+                'coin-title': '🪙 Tung đồng xu',
+                'tab-orange': '🟠 Bóng cam',
+                'tab-purple': '🟣 Bóng tím',
+                'btn-toss-orange': 'Tung bóng cam (4 đồng xu)',
+                'res-orange-init': 'Nhấp vào nút phía trên để tung...',
+                'btn-toss-purple': 'Tung bóng tím (2 đồng xu)',
+                'res-purple-init': 'Nhấp vào nút phía trên để tung...',
+                'mode-custom': 'Chuyển sang ⚙️ Hẹn giờ tùy chỉnh',
+                'mode-random': 'Chuyển sang 🎲 Hẹn giờ ngẫu nhiên',
+                'min': 'Phút',
+                'sec': 'Giây',
+                'btn-draw': '🎲 Rút thời gian (1~2 Phút)',
+                'btn-start': '▶️ Bắt đầu',
+                'btn-pause': '⏸️ Tạm dừng',
+                'btn-resume': '▶️ Tiếp tục',
+                'btn-reset': '🔄 Đặt lại',
+                'time-up': 'Hết giờ!',
+                'front': 'Sấp',
+                'back': 'Ngửa'
             }
         };
 
@@ -441,7 +518,6 @@
             document.getElementById('result-purple').textContent = dict[currentLang]['res-purple-init'];
         }
 
-
         // ================= 硬幣側欄邏輯 =================
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -472,34 +548,33 @@
             let results = [];
             let tFront = dict[currentLang]['front'];
             let tBack = dict[currentLang]['back'];
+            
             for(let i = 0; i < 4; i++) {
                 let isHeads = Math.random() < 0.5; 
                 results.push(isHeads ? tFront : tBack);
             }
+            
             const resultBox = document.getElementById('result-orange');
-            let tPos = dict[currentLang]['orange-pos'];
+            // 輸出為 4 列格線表格
             resultBox.innerHTML = `
-                <span style="color:#f6ad55; font-weight:bold;">${tPos}</span><br>
-                1. ${results[0]}<br>
-                2. ${results[1]}<br>
-                3. ${results[2]}<br>
-                4. ${results[3]}
+                <div class="table-box">
+                    <div class="cell-head">1</div>
+                    <div class="cell-head">2</div>
+                    <div class="cell-head">3</div>
+                    <div class="cell-head">4</div>
+                    <div class="cell-body">${results[0]}</div>
+                    <div class="cell-body">${results[1]}</div>
+                    <div class="cell-body">${results[2]}</div>
+                    <div class="cell-body">${results[3]}</div>
+                </div>
             `;
         }
 
         function tossPurple() {
-            let coin1Heads = Math.random() < 0.5;
-            let coin2Heads = Math.random() < 0.5;
-            let tLeft = dict[currentLang]['left'];
-            let tRight = dict[currentLang]['right'];
-            let pos1 = coin1Heads ? tLeft : tRight;
-            let pos2 = coin2Heads ? tLeft : tRight; 
             const resultBox = document.getElementById('result-purple');
-            let tPos = dict[currentLang]['purple-pos'];
+            // 紫球直接輸出 1, 2, 3, 4
             resultBox.innerHTML = `
-                <span style="color:#b794f4; font-weight:bold;">${tPos}</span><br>
-                1. ${pos1}<br>
-                2. ${pos2}
+                <div class="purple-box">1, 2, 3, 4</div>
             `;
         }
 
