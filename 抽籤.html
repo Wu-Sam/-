@@ -368,7 +368,7 @@
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
             let pos1 = coin1Heads ? "左" : "右";
-            let pos2 = coin2Heads ? "左" : "右"; // 修正後的第 371 行
+            let pos2 = coin2Heads ? "左" : "右"; 
             const resultBox = document.getElementById('result-purple');
             resultBox.innerHTML = `
                 <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
@@ -381,6 +381,7 @@
         let timerInterval;
         let autoResetTimeout; 
         let totalSeconds = 0;
+        let initialTotalSeconds = 0; 
         let isRunning = false;
         let isPaused = false; 
         let currentMode = 'random'; 
@@ -407,9 +408,52 @@
             }
         }
 
-        function playCountdownBeep() {
+        // 優化：過 30 秒提示音 -> 改為更響亮、更清脆的「雙振盪器金屬計時鈴聲」（叮叮兩短音）
+        function playThirtySecondsSound() {
             if (!audioCtx) return;
             
+            // 封裝單次敲擊函數，混合高低音頻
+            function ringSingleBell(startTime) {
+                const oscBase = audioCtx.createOscillator();
+                const oscHigh = audioCtx.createOscillator();
+                const gainBase = audioCtx.createGain();
+                const gainHigh = audioCtx.createGain();
+                
+                oscBase.connect(gainBase);
+                gainBase.connect(audioCtx.destination);
+                oscHigh.connect(gainHigh);
+                gainHigh.connect(audioCtx.destination);
+                
+                // 1. 基底敲擊音（使用三角波，提供極強的厚度與穿透力）
+                oscBase.type = 'triangle';
+                oscBase.frequency.setValueAtTime(1200, startTime); 
+                
+                // 2. 水晶泛音（使用正弦波，提供清脆的高頻金屬感）
+                oscHigh.type = 'sine';
+                oscHigh.frequency.setValueAtTime(2500, startTime); 
+                
+                // 音量包絡線：瞬間推到最高，隨後依物理特性快速衰減
+                gainBase.gain.setValueAtTime(0.8, startTime);
+                gainBase.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3); // 基音稍微留下一點餘韻
+                
+                gainHigh.gain.setValueAtTime(0.6, startTime);
+                gainHigh.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15); // 高頻瞬間切斷，造成清脆的敲擊感
+                
+                oscBase.start(startTime);
+                oscBase.stop(startTime + 0.35);
+                oscHigh.start(startTime);
+                oscHigh.stop(startTime + 0.2);
+            }
+
+            // 執行「叮叮」兩聲連敲
+            let now = audioCtx.currentTime;
+            ringSingleBell(now);          // 第一聲
+            ringSingleBell(now + 0.18);   // 第二聲（緊湊、清脆的黃金間隔）
+        }
+
+        // 倒數聲音：高頻明顯的 1046Hz 嗶聲
+        function playCountdownBeep() {
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -417,35 +461,34 @@
             gainNode.connect(audioCtx.destination);
             
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime); 
+            
             gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); 
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime + 0.15); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2); 
             
             osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.stop(audioCtx.currentTime + 0.2);
         }
 
+        // 結束聲音：長達 3 秒的長鳴音
         function playEndSound() {
             if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
             
-            for (let i = 0; i < 2; i++) {
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + (i * 1.1)); 
-                
-                let startTime = audioCtx.currentTime + (i * 1.1);
-                gainNode.gain.setValueAtTime(1.0, startTime); 
-                gainNode.gain.setValueAtTime(1.0, startTime + 0.75); 
-                gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8); 
-                
-                osc.start(startTime);
-                osc.stop(startTime + 0.8);
-            }
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime + 2.5); 
+            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 3.0); 
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 3.0); 
         }
 
         function updateDisplay(seconds) {
@@ -501,6 +544,7 @@
             display.style.color = "#1a202c"; 
             setToggleState('start');
             isPaused = false;
+            initialTotalSeconds = 0;
         }
 
         function setToggleState(state) {
@@ -527,6 +571,7 @@
             btnToggle.disabled = false;
             setToggleState('start');
             isPaused = false;
+            initialTotalSeconds = 0;
         }
 
         function toggleTimer() {
@@ -549,6 +594,10 @@
                 }
             } else {
                 isRunning = true;
+                
+                if (!isPaused) {
+                    initialTotalSeconds = totalSeconds;
+                }
                 isPaused = false;
                 setToggleState('pause');
                 btnMode.disabled = true; 
@@ -562,6 +611,10 @@
                 timerInterval = setInterval(function () {
                     totalSeconds--;
                     updateDisplay(totalSeconds);
+
+                    if (initialTotalSeconds - totalSeconds === 30) {
+                        playThirtySecondsSound();
+                    }
 
                     if (totalSeconds <= 10 && totalSeconds > 0) {
                         playCountdownBeep();
@@ -602,6 +655,7 @@
 
             isRunning = false;
             isPaused = false;
+            initialTotalSeconds = 0;
             display.classList.remove('time-up'); 
             
             btnMode.disabled = false;
