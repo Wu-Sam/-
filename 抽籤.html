@@ -1,0 +1,509 @@
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>計時器與硬幣工具</title>
+    <style>
+        /* 全局背景與字體設定 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden; /* 防止側欄出現時產生水平捲動條 */
+        }
+
+        /* 計時器主體卡片設計 */
+        .timer-card {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 450px; 
+            z-index: 10;
+        }
+
+        #btn-mode {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+            padding: 8px 15px;
+            font-size: 1rem;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        #btn-mode:hover { background-color: #e2e8f0; }
+
+        #display {
+            font-size: 7.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            background-color: #edf2f7;
+            padding: 15px 10px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: color 0.3s;
+            line-height: 1; 
+        }
+
+        .custom-input-area {
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .custom-input-area input {
+            width: 70px;
+            padding: 10px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+        }
+        .custom-input-area input:focus { border-color: #667eea; }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .row-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            border: none;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s ease;
+            flex: 1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:active { transform: scale(0.96); }
+        button:disabled {
+            background-color: #cbd5e0 !important;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #btn-draw { background-color: #667eea; }
+        #btn-draw:hover:not(:disabled) { background-color: #5a67d8; }
+        #btn-toggle { background-color: #48bb78; }
+        #btn-toggle:hover:not(:disabled) { filter: brightness(0.9); }
+        #btn-reset { background-color: #f56565; }
+        #btn-reset:hover:not(:disabled) { background-color: #e53e3e; }
+
+
+        /* 側欄 (Sidebar) 設計 */
+        #sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4a5568;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            z-index: 100;
+            width: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #sidebar-toggle:hover { background-color: #2d3748; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px; 
+            width: 320px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 90;
+            padding: 80px 20px 20px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open {
+            right: 0; 
+        }
+
+        .sidebar h3 {
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        /* 側欄頁籤切換按鈕設計 */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: #edf2f7;
+            padding: 5px;
+            border-radius: 12px;
+        }
+        .tab-btn {
+            background-color: transparent;
+            color: #4a5568;
+            padding: 10px;
+            font-size: 1rem;
+            box-shadow: none;
+            border-radius: 8px;
+        }
+        .tab-btn:hover { background-color: #e2e8f0; }
+        .tab-btn.active-orange { background-color: #ed8936; color: white; }
+        .tab-btn.active-purple { background-color: #9f7aea; color: white; }
+
+        /* 分頁容器 */
+        .page-content {
+            display: none; /* 預設隱藏，由JS控制顯示 */
+            flex-direction: column;
+            gap: 20px;
+        }
+        .page-content.active {
+            display: flex;
+        }
+
+        .coin-box {
+            background-color: #f7fafc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-orange { background-color: #ed8936; font-size: 1rem; padding: 10px; }
+        .btn-orange:hover { background-color: #dd6b20; }
+        
+        .btn-purple { background-color: #9f7aea; font-size: 1rem; padding: 10px; }
+        .btn-purple:hover { background-color: #805ad5; }
+
+        /* 硬幣結果顯示區 */
+        .result-box {
+            background-color: #2d3748;
+            color: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 120px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: left;
+            font-family: monospace;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="sidebar-toggle" onclick="toggleSidebar()">☰ 附加工具</button>
+
+    <div id="sidebar" class="sidebar">
+        <h3>🪙 台灣硬幣擲筊</h3>
+        
+        <div class="tab-container">
+            <button id="tab-orange" class="tab-btn active-orange" onclick="switchTab('orange')">🟠 橘球模式</button>
+            <button id="tab-purple" class="tab-btn" onclick="switchTab('purple')">🟣 紫球模式</button>
+        </div>
+
+        <div id="page-orange" class="page-content active">
+            <div class="coin-box">
+                <button class="btn-orange" onclick="tossOrange()">擲 橘球 (4個硬幣)</button>
+            </div>
+            <div id="result-orange" class="result-box">
+                請點擊上方按鈕開始擲橘球...
+            </div>
+        </div>
+
+        <div id="page-purple" class="page-content">
+            <div class="coin-box">
+                <button class="btn-purple" onclick="tossPurple()">擲 紫球 (2個硬幣)</button>
+            </div>
+            <div id="result-purple" class="result-box">
+                請點擊上方按鈕開始擲紫球...
+            </div>
+        </div>
+
+    </div>
+
+    <div class="timer-card">
+        <button id="btn-mode" onclick="switchMode()">切換至 ⚙️ 自訂模式</button>
+        
+        <div id="display">00:00</div>
+        
+        <div class="custom-input-area" id="custom-area">
+            <input type="number" id="input-min" min="0" max="99" value="0" oninput="updateCustomDisplay()"> 分
+            <input type="number" id="input-sec" min="0" max="59" value="0" oninput="updateCustomDisplay()"> 秒
+        </div>
+
+        <div class="button-group">
+            <button id="btn-draw" onclick="drawTime()">🎲 抽取時間 (1~2分鐘)</button>
+            <div class="row-buttons">
+                <button id="btn-toggle" onclick="toggleTimer()" disabled>▶️ 開始</button>
+                <button id="btn-reset" onclick="resetTimer()">🔄 RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= 硬幣側欄邏輯 =================
+
+        // 開關側欄
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 切換頁籤功能
+        function switchTab(mode) {
+            // 取得元素
+            const pageOrange = document.getElementById('page-orange');
+            const pagePurple = document.getElementById('page-purple');
+            const tabOrange = document.getElementById('tab-orange');
+            const tabPurple = document.getElementById('tab-purple');
+
+            // 重置狀態
+            pageOrange.classList.remove('active');
+            pagePurple.classList.remove('active');
+            tabOrange.classList.remove('active-orange');
+            tabPurple.classList.remove('active-purple');
+
+            // 套用新狀態
+            if (mode === 'orange') {
+                pageOrange.classList.add('active');
+                tabOrange.classList.add('active-orange');
+            } else {
+                pagePurple.classList.add('active');
+                tabPurple.classList.add('active-purple');
+            }
+        }
+
+        // 擲橘球 (4個硬幣：正面為前，反面為後) -> 輸出至橘球專屬螢幕
+        function tossOrange() {
+            let results = [];
+            for(let i = 0; i < 4; i++) {
+                let isHeads = Math.random() < 0.5; 
+                results.push(isHeads ? "前" : "後");
+            }
+            
+            const resultBox = document.getElementById('result-orange');
+            resultBox.innerHTML = `
+                <span style="color:#f6ad55; font-weight:bold;">橘球位置:</span><br>
+                1. ${results[0]}<br>
+                2. ${results[1]}<br>
+                3. ${results[2]}<br>
+                4. ${results[3]}
+            `;
+        }
+
+        // 擲紫球 (2個硬幣：硬幣1 左/右，硬幣2 前/後) -> 輸出至紫球專屬螢幕
+        function tossPurple() {
+            let coin1Heads = Math.random() < 0.5;
+            let coin2Heads = Math.random() < 0.5;
+
+            let pos1 = coin1Heads ? "左" : "右";
+            let pos2 = coin2Heads ? "左" : "右";
+
+            const resultBox = document.getElementById('result-purple');
+            resultBox.innerHTML = `
+                <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
+                1. ${pos1}<br>
+                2. ${pos2}
+            `;
+        }
+
+        // ================= 計時器邏輯 =================
+        let timerInterval;
+        let totalSeconds = 0;
+        let isRunning = false;
+        let isPaused = false; 
+        let currentMode = 'random'; 
+
+        const display = document.getElementById('display');
+        const btnMode = document.getElementById('btn-mode');
+        const btnDraw = document.getElementById('btn-draw');
+        const customArea = document.getElementById('custom-area');
+        const btnToggle = document.getElementById('btn-toggle');
+        const inputMin = document.getElementById('input-min');
+        const inputSec = document.getElementById('input-sec');
+
+        function playBeep() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return; 
+            const ctx = new AudioContext();
+            for (let i = 0; i < 3; i++) {
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime + (i * 0.3)); 
+                gainNode.gain.setValueAtTime(1, ctx.currentTime + (i * 0.3));
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (i * 0.3) + 0.2);
+                osc.start(ctx.currentTime + (i * 0.3));
+                osc.stop(ctx.currentTime + (i * 0.3) + 0.2);
+            }
+        }
+
+        function updateDisplay(seconds) {
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+            m = m < 10 ? "0" + m : m;
+            s = s < 10 ? "0" + s : s;
+            display.textContent = m + ":" + s;
+        }
+
+        function updateCustomDisplay() {
+            if (isRunning || isPaused) return; 
+            let m = parseInt(inputMin.value) || 0;
+            let s = parseInt(inputSec.value) || 0;
+            totalSeconds = (m * 60) + s;
+            updateDisplay(totalSeconds);
+            
+            display.style.color = "#2d3748";
+            btnToggle.disabled = totalSeconds <= 0;
+        }
+
+        function switchMode() {
+            if (isRunning) return; 
+            resetTimer();
+
+            if (currentMode === 'random') {
+                currentMode = 'custom';
+                btnMode.innerHTML = "切換至 🎲 隨機模式";
+                btnDraw.style.display = 'none';
+                customArea.style.display = 'flex';
+                updateCustomDisplay(); 
+            } else {
+                currentMode = 'random';
+                btnMode.innerHTML = "切換至 ⚙️ 自訂模式";
+                btnDraw.style.display = 'block';
+                customArea.style.display = 'none';
+                btnToggle.disabled = true; 
+            }
+        }
+
+        function setToggleState(state) {
+            if (state === 'start') {
+                btnToggle.innerHTML = "▶️ 開始";
+                btnToggle.style.backgroundColor = "#48bb78"; 
+            } else if (state === 'pause') {
+                btnToggle.innerHTML = "⏸️ 暫停";
+                btnToggle.style.backgroundColor = "#ed8936"; 
+            } else if (state === 'resume') {
+                btnToggle.innerHTML = "▶️ 繼續";
+                btnToggle.style.backgroundColor = "#48bb78"; 
+            }
+        }
+
+        function drawTime() {
+            if (isRunning) return; 
+            totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            updateDisplay(totalSeconds);
+            display.style.color = "#2d3748";
+            btnToggle.disabled = false;
+            setToggleState('start');
+            isPaused = false;
+        }
+
+        function toggleTimer() {
+            if (totalSeconds <= 0) return;
+
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                isPaused = true;
+                setToggleState('resume');
+                btnMode.disabled = false; 
+                
+                if (currentMode === 'random') btnDraw.disabled = false;
+                if (currentMode === 'custom') {
+                    inputMin.disabled = false;
+                    inputSec.disabled = false;
+                }
+            } else {
+                isRunning = true;
+                isPaused = false;
+                setToggleState('pause');
+                btnMode.disabled = true; 
+                btnDraw.disabled = true; 
+                
+                if (currentMode === 'custom') {
+                    inputMin.disabled = true;
+                    inputSec.disabled = true;
+                }
+
+                const tempAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (tempAudioCtx.state === 'suspended') tempAudioCtx.resume();
+
+                timerInterval = setInterval(function () {
+                    totalSeconds--;
+                    updateDisplay(totalSeconds);
+
+                    if (totalSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        isPaused = false;
+                        display.textContent = "時間到！";
+                        display.style.color = "#e53e3e"; 
+                        
+                        setToggleState('start');
+                        btnToggle.disabled = true;
+                        btnMode.disabled = false;
+
+                        if (currentMode === 'random') btnDraw.disabled = false;
+                        if (currentMode === 'custom') {
+                            inputMin.disabled = false;
+                            inputSec.disabled = false;
+                        }
+                        
+                        playBeep();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isPaused = false;
+            
+            btnMode.disabled = false;
+            if (currentMode === 'random') {
+                totalSeconds = 0;
+                updateDisplay(0);
+                btnDraw.disabled = false;
+                btnToggle.disabled = true;
+            } else {
+                updateCustomDisplay();
+                inputMin.disabled = false;
+                inputSec.disabled = false;
+            }
+            
+            display.style.color = "#2d3748"; 
+            setToggleState('start');
+        }
+    </script>
+
+</body>
+</html>
