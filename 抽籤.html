@@ -105,7 +105,7 @@
             margin-bottom: 30px;
             letter-spacing: 1px;
             box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.06);
-            transition: color 0.3s, font-size 0.2s, background-color 0.3s; 
+            transition: color 0.2s, font-size 0.2s, background-color 0.3s; 
             line-height: 1; 
             white-space: nowrap; 
             overflow: hidden;
@@ -408,11 +408,10 @@
             }
         }
 
-        // 優化：過 30 秒提示音 -> 改為更響亮、更清脆的「雙振盪器金屬計時鈴聲」（叮叮兩短音）
+        // 過 30 秒提示音 -> 雙振盪器金屬計時鈴聲（叮叮兩短音）
         function playThirtySecondsSound() {
             if (!audioCtx) return;
             
-            // 封裝單次敲擊函數，混合高低音頻
             function ringSingleBell(startTime) {
                 const oscBase = audioCtx.createOscillator();
                 const oscHigh = audioCtx.createOscillator();
@@ -424,20 +423,17 @@
                 oscHigh.connect(gainHigh);
                 gainHigh.connect(audioCtx.destination);
                 
-                // 1. 基底敲擊音（使用三角波，提供極強的厚度與穿透力）
                 oscBase.type = 'triangle';
                 oscBase.frequency.setValueAtTime(1200, startTime); 
                 
-                // 2. 水晶泛音（使用正弦波，提供清脆的高頻金屬感）
                 oscHigh.type = 'sine';
                 oscHigh.frequency.setValueAtTime(2500, startTime); 
                 
-                // 音量包絡線：瞬間推到最高，隨後依物理特性快速衰減
                 gainBase.gain.setValueAtTime(0.8, startTime);
-                gainBase.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3); // 基音稍微留下一點餘韻
+                gainBase.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3); 
                 
                 gainHigh.gain.setValueAtTime(0.6, startTime);
-                gainHigh.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15); // 高頻瞬間切斷，造成清脆的敲擊感
+                gainHigh.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15); 
                 
                 oscBase.start(startTime);
                 oscBase.stop(startTime + 0.35);
@@ -445,10 +441,9 @@
                 oscHigh.stop(startTime + 0.2);
             }
 
-            // 執行「叮叮」兩聲連敲
             let now = audioCtx.currentTime;
-            ringSingleBell(now);          // 第一聲
-            ringSingleBell(now + 0.18);   // 第二聲（緊湊、清脆的黃金間隔）
+            ringSingleBell(now);          
+            ringSingleBell(now + 0.18);   
         }
 
         // 倒數聲音：高頻明顯的 1046Hz 嗶聲
@@ -491,6 +486,30 @@
             osc.stop(audioCtx.currentTime + 3.0); 
         }
 
+        // 新增：根據當前時間與初始時間動態切換顯示顏色
+        function applyDisplayColor() {
+            if (totalSeconds <= 0) {
+                return; // 時間到由主流程接管樣式
+            }
+            
+            // 1. 優先判定是否進入倒數 10 秒 -> 紅橙色
+            if (totalSeconds <= 10) {
+                display.style.color = "#ff5722"; 
+                return;
+            }
+            
+            // 計算已過去的秒數
+            let elapsed = initialTotalSeconds - totalSeconds;
+            
+            // 2. 如果尚未開始，或在 30 秒內 -> 綠色
+            if (elapsed <= 30) {
+                display.style.color = "#38a169"; 
+            } else {
+                // 3. 超過 30 秒且未到最後 10 秒 -> 黑色
+                display.style.color = "#1a202c"; 
+            }
+        }
+
         function updateDisplay(seconds) {
             let m = Math.floor(seconds / 60);
             let s = seconds % 60;
@@ -504,10 +523,11 @@
             let m = parseInt(inputMin.value) || 0;
             let s = parseInt(inputSec.value) || 0;
             totalSeconds = (m * 60) + s;
+            initialTotalSeconds = totalSeconds; // 自訂輸入時即時更新初始參考值
             updateDisplay(totalSeconds);
             
             display.classList.remove('time-up'); 
-            display.style.color = "#1a202c";
+            applyDisplayColor();
             btnToggle.disabled = totalSeconds <= 0;
         }
 
@@ -526,7 +546,9 @@
                 inputMin.disabled = false;
                 inputSec.disabled = false;
                 totalSeconds = 0;
+                initialTotalSeconds = 0;
                 updateDisplay(0);
+                display.style.color = "#1a202c";
                 btnToggle.disabled = true;
             } else {
                 currentMode = 'random';
@@ -535,16 +557,16 @@
                 customArea.style.display = 'none';
                 
                 totalSeconds = 0;
+                initialTotalSeconds = 0;
                 updateDisplay(0);
+                display.style.color = "#1a202c";
                 btnDraw.disabled = false;
                 btnToggle.disabled = true;
             }
             
             display.classList.remove('time-up');
-            display.style.color = "#1a202c"; 
             setToggleState('start');
             isPaused = false;
-            initialTotalSeconds = 0;
         }
 
         function setToggleState(state) {
@@ -565,13 +587,13 @@
             if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
             totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            initialTotalSeconds = totalSeconds; // 抽取時間時鎖定初始參考值
             display.classList.remove('time-up'); 
             updateDisplay(totalSeconds);
-            display.style.color = "#1a202c";
+            applyDisplayColor();
             btnToggle.disabled = false;
             setToggleState('start');
             isPaused = false;
-            initialTotalSeconds = 0;
         }
 
         function toggleTimer() {
@@ -608,9 +630,13 @@
                     inputSec.disabled = true;
                 }
 
+                // 啟動時立刻對齊一次顏色
+                applyDisplayColor();
+
                 timerInterval = setInterval(function () {
                     totalSeconds--;
                     updateDisplay(totalSeconds);
+                    applyDisplayColor(); // 每秒動態檢查並更新顏色
 
                     if (initialTotalSeconds - totalSeconds === 30) {
                         playThirtySecondsSound();
@@ -662,6 +688,7 @@
             if (currentMode === 'random') {
                 totalSeconds = 0;
                 updateDisplay(0);
+                display.style.color = "#1a202c"; 
                 btnDraw.disabled = false;
                 btnToggle.disabled = true;
             } else {
@@ -669,8 +696,6 @@
                 inputMin.disabled = false;
                 inputSec.disabled = false;
             }
-            
-            display.style.color = "#1a202c"; 
             setToggleState('start');
         }
 
