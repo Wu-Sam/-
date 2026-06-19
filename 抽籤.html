@@ -47,7 +47,7 @@
 
         /* 側欄開關按鈕美化 */
         #sidebar-toggle {
-            position: static; /* 解除原本的 fixed 定位，交由父層 flex 排版 */
+            position: static; 
             background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
             color: white;
             padding: 10px 18px;
@@ -112,7 +112,6 @@
             border: 1px solid #edf2f7;
         }
 
-        /* 當時間到時的視覺震撼感 */
         #display.time-up {
             font-size: 4.2rem;
             letter-spacing: 0px;
@@ -272,7 +271,7 @@
 <body>
 
     <div class="top-right-header">
-        <div class="school-badge">🏫 溪南國中 SNJH</div>
+        <div class="school-badge">🏫 溪南國中</div>
         <button id="sidebar-toggle" onclick="toggleSidebar()">☰ 附加工具</button>
     </div>
 
@@ -369,7 +368,7 @@
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
             let pos1 = coin1Heads ? "左" : "右";
-            let pos2 = coin2Heads ? "左" : "右";
+            let pos2 = coin2Heads ? "left" ? "左" : "右";
             const resultBox = document.getElementById('result-purple');
             resultBox.innerHTML = `
                 <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
@@ -378,13 +377,16 @@
             `;
         }
 
-        // ================= 計時器邏輯 =================
+        // ================= 計時器與手機音效解鎖邏輯 =================
         let timerInterval;
         let autoResetTimeout; 
         let totalSeconds = 0;
         let isRunning = false;
         let isPaused = false; 
         let currentMode = 'random'; 
+        
+        // 核心修改：建立單一全域聲音引擎，用來繞過手機瀏覽器的靜音封鎖
+        let audioCtx = null; 
 
         const display = document.getElementById('display');
         const btnMode = document.getElementById('btn-mode');
@@ -394,40 +396,56 @@
         const inputMin = document.getElementById('input-min');
         const inputSec = document.getElementById('input-sec');
 
+        // 初始化/解鎖手機聲音引擎
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            // 如果引擎處於掛起狀態（手機常見保護機制），將其喚醒
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         function playCountdownBeep() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) return; 
-            const ctx = new AudioContext();
-            const osc = ctx.createOscillator();
-            const gainNode = ctx.createGain();
+            if (!audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
             
             osc.connect(gainNode);
-            gainNode.connect(ctx.destination);
+            gainNode.connect(audioCtx.destination);
+            
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, ctx.currentTime); 
-            gainNode.gain.setValueAtTime(1.0, ctx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); 
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); 
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
         function playEndSound() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) return; 
-            const ctx = new AudioContext();
+            if (!audioCtx) return;
             
             for (let i = 0; i < 2; i++) {
-                const osc = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                osc.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, ctx.currentTime + (i * 1.1)); 
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
                 
-                let startTime = ctx.currentTime + (i * 1.1);
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + (i * 1.1)); 
+                
+                let startTime = audioCtx.currentTime + (i * 1.1);
                 gainNode.gain.setValueAtTime(1.0, startTime); 
                 gainNode.gain.setValueAtTime(1.0, startTime + 0.75); 
                 gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8); 
+                
                 osc.start(startTime);
                 osc.stop(startTime + 0.8);
             }
@@ -453,7 +471,6 @@
             btnToggle.disabled = totalSeconds <= 0;
         }
 
-        // 切換模式自動 RESET 歸零
         function switchMode() {
             if (isRunning) return; 
             if (autoResetTimeout) clearTimeout(autoResetTimeout); 
@@ -519,6 +536,9 @@
             if (totalSeconds <= 0) return;
             if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
+            // 【核心修正點】只要使用者點擊按鈕，立刻初始化/解鎖手機音效
+            initAudio(); 
+
             if (isRunning) {
                 clearInterval(timerInterval);
                 isRunning = false;
@@ -542,9 +562,6 @@
                     inputMin.disabled = true;
                     inputSec.disabled = true;
                 }
-
-                const tempAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (tempAudioCtx.state === 'suspended') tempAudioCtx.resume();
 
                 timerInterval = setInterval(function () {
                     totalSeconds--;
@@ -575,7 +592,6 @@
                         
                         playEndSound();
 
-                        // 10秒自動回到0:00
                         autoResetTimeout = setTimeout(function() {
                             resetTimer();
                         }, 10000);
