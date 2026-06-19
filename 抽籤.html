@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -51,8 +52,17 @@
             margin-bottom: 25px;
             letter-spacing: 2px;
             box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: color 0.3s;
+            transition: color 0.3s, font-size 0.2s; /* 讓字體縮放時有平滑過渡 */
             line-height: 1; 
+            white-space: nowrap; /* 強迫文字絕對保持在同一排 */
+            overflow: hidden;
+        }
+
+        /* 當時間到時，縮小字體確保「時間到！」在 card 內完美變一排 */
+        #display.time-up {
+            font-size: 4.2rem;
+            letter-spacing: 0px;
+            padding: 40px 10px; /* 微調上下邊距讓視覺更平衡 */
         }
 
         .custom-input-area {
@@ -109,7 +119,6 @@
         #btn-toggle:hover:not(:disabled) { filter: brightness(0.9); }
         #btn-reset { background-color: #f56565; }
         #btn-reset:hover:not(:disabled) { background-color: #e53e3e; }
-
 
         /* 側欄 (Sidebar) 設計 */
         #sidebar-toggle {
@@ -176,7 +185,7 @@
 
         /* 分頁容器 */
         .page-content {
-            display: none; /* 預設隱藏，由JS控制顯示 */
+            display: none; 
             flex-direction: column;
             gap: 20px;
         }
@@ -268,27 +277,22 @@
     <script>
         // ================= 硬幣側欄邏輯 =================
 
-        // 開關側欄
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
         }
 
-        // 切換頁籤功能
         function switchTab(mode) {
-            // 取得元素
             const pageOrange = document.getElementById('page-orange');
             const pagePurple = document.getElementById('page-purple');
             const tabOrange = document.getElementById('tab-orange');
             const tabPurple = document.getElementById('tab-purple');
 
-            // 重置狀態
             pageOrange.classList.remove('active');
             pagePurple.classList.remove('active');
             tabOrange.classList.remove('active-orange');
             tabPurple.classList.remove('active-purple');
 
-            // 套用新狀態
             if (mode === 'orange') {
                 pageOrange.classList.add('active');
                 tabOrange.classList.add('active-orange');
@@ -298,7 +302,6 @@
             }
         }
 
-        // 擲橘球 (4個硬幣：正面為前，反面為後) -> 輸出至橘球專屬螢幕
         function tossOrange() {
             let results = [];
             for(let i = 0; i < 4; i++) {
@@ -316,7 +319,6 @@
             `;
         }
 
-        // 擲紫球 (2個硬幣：硬幣1 左/右，硬幣2 前/後) -> 輸出至紫球專屬螢幕
         function tossPurple() {
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
@@ -334,6 +336,7 @@
 
         // ================= 計時器邏輯 =================
         let timerInterval;
+        let autoResetTimeout; 
         let totalSeconds = 0;
         let isRunning = false;
         let isPaused = false; 
@@ -347,21 +350,47 @@
         const inputMin = document.getElementById('input-min');
         const inputSec = document.getElementById('input-sec');
 
-        function playBeep() {
+        function playCountdownBeep() {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!AudioContext) return; 
             const ctx = new AudioContext();
-            for (let i = 0; i < 3; i++) {
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, ctx.currentTime); 
+            gainNode.gain.setValueAtTime(1.0, ctx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); 
+            
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.1);
+        }
+
+        function playEndSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return; 
+            const ctx = new AudioContext();
+            
+            for (let i = 0; i < 2; i++) {
                 const osc = ctx.createOscillator();
                 const gainNode = ctx.createGain();
+                
                 osc.connect(gainNode);
                 gainNode.connect(ctx.destination);
+                
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, ctx.currentTime + (i * 0.3)); 
-                gainNode.gain.setValueAtTime(1, ctx.currentTime + (i * 0.3));
-                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (i * 0.3) + 0.2);
-                osc.start(ctx.currentTime + (i * 0.3));
-                osc.stop(ctx.currentTime + (i * 0.3) + 0.2);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + (i * 1.1)); 
+                
+                let startTime = ctx.currentTime + (i * 1.1);
+                gainNode.gain.setValueAtTime(1.0, startTime); 
+                gainNode.gain.setValueAtTime(1.0, startTime + 0.75); 
+                gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8); 
+                
+                osc.start(startTime);
+                osc.stop(startTime + 0.8);
             }
         }
 
@@ -380,27 +409,48 @@
             totalSeconds = (m * 60) + s;
             updateDisplay(totalSeconds);
             
+            display.classList.remove('time-up'); 
             display.style.color = "#2d3748";
             btnToggle.disabled = totalSeconds <= 0;
         }
 
+        // 核心修改：切換模式時「自動強制 RESET 歸零」
         function switchMode() {
             if (isRunning) return; 
-            resetTimer();
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); // 清除10秒自動重置倒數
 
             if (currentMode === 'random') {
                 currentMode = 'custom';
                 btnMode.innerHTML = "切換至 🎲 隨機 Timer 模式";
                 btnDraw.style.display = 'none';
                 customArea.style.display = 'flex';
-                updateCustomDisplay(); 
+                
+                // 自動 RESET 為自訂模式的初始值 00:00
+                inputMin.value = 0;
+                inputSec.value = 0;
+                inputMin.disabled = false;
+                inputSec.disabled = false;
+                totalSeconds = 0;
+                updateDisplay(0);
+                btnToggle.disabled = true;
             } else {
                 currentMode = 'random';
                 btnMode.innerHTML = "切換至 ⚙️ 自訂 Timer 模式";
                 btnDraw.style.display = 'block';
                 customArea.style.display = 'none';
-                btnToggle.disabled = true; 
+                
+                // 自動 RESET 為隨機模式的初始值 00:00
+                totalSeconds = 0;
+                updateDisplay(0);
+                btnDraw.disabled = false;
+                btnToggle.disabled = true;
             }
+            
+            // 通用畫面還原
+            display.classList.remove('time-up');
+            display.style.color = "#2d3748"; 
+            setToggleState('start');
+            isPaused = false;
         }
 
         function setToggleState(state) {
@@ -418,7 +468,10 @@
 
         function drawTime() {
             if (isRunning) return; 
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
             totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            display.classList.remove('time-up'); 
             updateDisplay(totalSeconds);
             display.style.color = "#2d3748";
             btnToggle.disabled = false;
@@ -428,6 +481,7 @@
 
         function toggleTimer() {
             if (totalSeconds <= 0) return;
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
             if (isRunning) {
                 clearInterval(timerInterval);
@@ -460,10 +514,16 @@
                     totalSeconds--;
                     updateDisplay(totalSeconds);
 
+                    if (totalSeconds <= 10 && totalSeconds > 0) {
+                        playCountdownBeep();
+                    }
+
                     if (totalSeconds <= 0) {
                         clearInterval(timerInterval);
                         isRunning = false;
                         isPaused = false;
+                        
+                        display.classList.add('time-up');
                         display.textContent = "時間到！";
                         display.style.color = "#e53e3e"; 
                         
@@ -477,7 +537,11 @@
                             inputSec.disabled = false;
                         }
                         
-                        playBeep();
+                        playEndSound();
+
+                        autoResetTimeout = setTimeout(function() {
+                            resetTimer();
+                        }, 10000);
                     }
                 }, 1000);
             }
@@ -485,8 +549,11 @@
 
         function resetTimer() {
             clearInterval(timerInterval);
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
             isRunning = false;
             isPaused = false;
+            display.classList.remove('time-up'); 
             
             btnMode.disabled = false;
             if (currentMode === 'random') {
@@ -503,6 +570,21 @@
             display.style.color = "#2d3748"; 
             setToggleState('start');
         }
+
+        // ================= 鍵盤快捷鍵邏輯 =================
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (document.activeElement.tagName === 'INPUT' && e.code === 'Space') {
+                    return; 
+                }
+
+                e.preventDefault(); 
+
+                if (!btnToggle.disabled) {
+                    toggleTimer();
+                }
+            }
+        });
     </script>
 
 </body>
