@@ -17,7 +17,7 @@
             overflow-x: hidden; 
         }
 
-        /* 右上角學校專屬 Header 區域 */
+        /* 右上角整合區域 */
         .top-right-header {
             position: fixed;
             top: 20px;
@@ -28,7 +28,6 @@
             z-index: 100;
         }
 
-        /* 溪南國中徽章樣式 */
         .school-badge {
             font-size: 1.1rem;
             font-weight: 700;
@@ -45,7 +44,23 @@
             gap: 6px;
         }
 
-        /* 側欄開關按鈕美化 */
+        /* 語言下拉選單設計 */
+        #lang-select {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+            padding: 9px 12px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+        #lang-select:hover { box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
+
         #sidebar-toggle {
             position: static; 
             background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
@@ -65,7 +80,7 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* 計時器主體卡片設計 */
+        /* 計時器主體卡片 */
         .timer-card {
             background-color: white;
             padding: 45px 40px;
@@ -271,57 +286,162 @@
 <body>
 
     <div class="top-right-header">
-        <div class="school-badge">🏫 溪南國中</div>
-        <button id="sidebar-toggle" onclick="toggleSidebar()">☰ 附加工具</button>
+        <div class="school-badge" data-i18n="badge">🏫 溪南國中</div>
+        <select id="lang-select" onchange="changeLanguage()">
+            <option value="zh">🇹🇼 中文</option>
+            <option value="en">🇺🇸 EN</option>
+        </select>
+        <button id="sidebar-toggle" onclick="toggleSidebar()" data-i18n="tools">☰ 附加工具</button>
     </div>
 
     <div id="sidebar" class="sidebar">
-        <h3>🪙 硬幣擲球</h3>
+        <h3 data-i18n="coin-title">🪙 硬幣擲球</h3>
         
         <div class="tab-container">
-            <button id="tab-orange" class="tab-btn active-orange" onclick="switchTab('orange')">🟠 橘球模式</button>
-            <button id="tab-purple" class="tab-btn" onclick="switchTab('purple')">🟣 紫球模式</button>
+            <button id="tab-orange" class="tab-btn active-orange" onclick="switchTab('orange')" data-i18n="tab-orange">🟠 橘球模式</button>
+            <button id="tab-purple" class="tab-btn" onclick="switchTab('purple')" data-i18n="tab-purple">🟣 紫球模式</button>
         </div>
 
         <div id="page-orange" class="page-content active">
             <div class="coin-box">
-                <button class="btn-orange" onclick="tossOrange()">擲 橘球 (4個硬幣)</button>
+                <button class="btn-orange" onclick="tossOrange()" data-i18n="btn-toss-orange">擲 橘球 (4個硬幣)</button>
             </div>
-            <div id="result-orange" class="result-box">
+            <div id="result-orange" class="result-box" data-i18n="res-orange-init">
                 請點擊上方按鈕開始擲橘球...
             </div>
         </div>
 
         <div id="page-purple" class="page-content">
             <div class="coin-box">
-                <button class="btn-purple" onclick="tossPurple()">擲 紫球 (2個硬幣)</button>
+                <button class="btn-purple" onclick="tossPurple()" data-i18n="btn-toss-purple">擲 紫球 (2個硬幣)</button>
             </div>
-            <div id="result-purple" class="result-box">
+            <div id="result-purple" class="result-box" data-i18n="res-purple-init">
                 請點擊上方按鈕開始擲紫球...
             </div>
         </div>
     </div>
 
     <div class="timer-card">
-        <button id="btn-mode" onclick="switchMode()">切換至 ⚙️ 自訂 Timer 模式</button>
+        <button id="btn-mode" onclick="switchMode()" data-i18n="mode-custom">切換至 ⚙️ 自訂 Timer 模式</button>
         
         <div id="display">00:00</div>
         
         <div class="custom-input-area" id="custom-area">
-            <input type="number" id="input-min" min="0" max="99" value="0" oninput="updateCustomDisplay()"> 分
-            <input type="number" id="input-sec" min="0" max="59" value="0" oninput="updateCustomDisplay()"> 秒
+            <input type="number" id="input-min" min="0" max="99" value="0" oninput="updateCustomDisplay()"> <span data-i18n="min">分</span>
+            <input type="number" id="input-sec" min="0" max="59" value="0" oninput="updateCustomDisplay()"> <span data-i18n="sec">秒</span>
         </div>
 
         <div class="button-group">
-            <button id="btn-draw" onclick="drawTime()">🎲 抽取時間 (1~2分鐘)</button>
+            <button id="btn-draw" onclick="drawTime()" data-i18n="btn-draw">🎲 抽取時間 (1~2分鐘)</button>
             <div class="row-buttons">
-                <button id="btn-toggle" onclick="toggleTimer()" disabled>▶️ 開始</button>
-                <button id="btn-reset" onclick="resetTimer()">🔄 RESET</button>
+                <button id="btn-toggle" onclick="toggleTimer()" disabled data-i18n="btn-start">▶️ 開始</button>
+                <button id="btn-reset" onclick="resetTimer()" data-i18n="btn-reset">🔄 RESET</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ================= 多國語言 (i18n) 系統 =================
+        const dict = {
+            'zh': {
+                'title': '溪南國中 - 計時器與硬幣工具',
+                'badge': '🏫 溪南國中',
+                'tools': '☰ 附加工具',
+                'coin-title': '🪙 硬幣擲球',
+                'tab-orange': '🟠 橘球模式',
+                'tab-purple': '🟣 紫球模式',
+                'btn-toss-orange': '擲 橘球 (4個硬幣)',
+                'res-orange-init': '請點擊上方按鈕開始擲橘球...',
+                'btn-toss-purple': '擲 紫球 (2個硬幣)',
+                'res-purple-init': '請點擊上方按鈕開始擲紫球...',
+                'mode-custom': '切換至 ⚙️ 自訂 Timer 模式',
+                'mode-random': '切換至 🎲 隨機 Timer 模式',
+                'min': '分',
+                'sec': '秒',
+                'btn-draw': '🎲 抽取時間 (1~2分鐘)',
+                'btn-start': '▶️ 開始',
+                'btn-pause': '⏸️ 暫停',
+                'btn-resume': '▶️ 繼續',
+                'btn-reset': '🔄 RESET',
+                'time-up': '時間到！',
+                'orange-pos': '橘球位置:',
+                'purple-pos': '紫球位置:',
+                'front': '前',
+                'back': '後',
+                'left': '左',
+                'right': '右'
+            },
+            'en': {
+                'title': 'Xinan JHS - Timer & Coin Tool',
+                'badge': '🏫 SNJH',
+                'tools': '☰ Tools',
+                'coin-title': '🪙 Coin Toss',
+                'tab-orange': '🟠 Orange',
+                'tab-purple': '🟣 Purple',
+                'btn-toss-orange': 'Toss Orange (4 Coins)',
+                'res-orange-init': 'Click the button above to toss...',
+                'btn-toss-purple': 'Toss Purple (2 Coins)',
+                'res-purple-init': 'Click the button above to toss...',
+                'mode-custom': 'Switch to ⚙️ Custom Timer',
+                'mode-random': 'Switch to 🎲 Random Timer',
+                'min': 'Min',
+                'sec': 'Sec',
+                'btn-draw': '🎲 Draw Time (1~2 Min)',
+                'btn-start': '▶️ Start',
+                'btn-pause': '⏸️ Pause',
+                'btn-resume': '▶️ Resume',
+                'btn-reset': '🔄 RESET',
+                'time-up': 'Time\'s Up!',
+                'orange-pos': 'Orange Pos:',
+                'purple-pos': 'Purple Pos:',
+                'front': 'Heads',
+                'back': 'Tails',
+                'left': 'Left',
+                'right': 'Right'
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function changeLanguage() {
+            currentLang = document.getElementById('lang-select').value;
+            document.title = dict[currentLang]['title'];
+
+            // 更新所有帶有 data-i18n 的靜態元素
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[currentLang][key]) {
+                    el.textContent = dict[currentLang][key];
+                }
+            });
+
+            // 更新動態狀態文字：模式按鈕
+            if (currentMode === 'random') {
+                btnMode.innerHTML = dict[currentLang]['mode-custom'];
+            } else {
+                btnMode.innerHTML = dict[currentLang]['mode-random'];
+            }
+
+            // 更新動態狀態文字：開始/暫停按鈕
+            if (!isRunning && !isPaused && totalSeconds > 0) {
+                btnToggle.innerHTML = dict[currentLang]['btn-start'];
+            } else if (isRunning) {
+                btnToggle.innerHTML = dict[currentLang]['btn-pause'];
+            } else if (isPaused) {
+                btnToggle.innerHTML = dict[currentLang]['btn-resume'];
+            }
+
+            // 如果畫面上正好是「時間到」，切換語言時也要跟著換
+            if (display.classList.contains('time-up')) {
+                display.textContent = dict[currentLang]['time-up'];
+            }
+
+            // 重置硬幣結果面板以對齊語言
+            document.getElementById('result-orange').textContent = dict[currentLang]['res-orange-init'];
+            document.getElementById('result-purple').textContent = dict[currentLang]['res-purple-init'];
+        }
+
+
         // ================= 硬幣側欄邏輯 =================
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -350,13 +470,16 @@
 
         function tossOrange() {
             let results = [];
+            let tFront = dict[currentLang]['front'];
+            let tBack = dict[currentLang]['back'];
             for(let i = 0; i < 4; i++) {
                 let isHeads = Math.random() < 0.5; 
-                results.push(isHeads ? "前" : "後");
+                results.push(isHeads ? tFront : tBack);
             }
             const resultBox = document.getElementById('result-orange');
+            let tPos = dict[currentLang]['orange-pos'];
             resultBox.innerHTML = `
-                <span style="color:#f6ad55; font-weight:bold;">橘球位置:</span><br>
+                <span style="color:#f6ad55; font-weight:bold;">${tPos}</span><br>
                 1. ${results[0]}<br>
                 2. ${results[1]}<br>
                 3. ${results[2]}<br>
@@ -367,11 +490,14 @@
         function tossPurple() {
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
-            let pos1 = coin1Heads ? "左" : "右";
-            let pos2 = coin2Heads ? "左" : "右"; 
+            let tLeft = dict[currentLang]['left'];
+            let tRight = dict[currentLang]['right'];
+            let pos1 = coin1Heads ? tLeft : tRight;
+            let pos2 = coin2Heads ? tLeft : tRight; 
             const resultBox = document.getElementById('result-purple');
+            let tPos = dict[currentLang]['purple-pos'];
             resultBox.innerHTML = `
-                <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
+                <span style="color:#b794f4; font-weight:bold;">${tPos}</span><br>
                 1. ${pos1}<br>
                 2. ${pos2}
             `;
@@ -408,7 +534,7 @@
             }
         }
 
-        // 過 30 秒提示音 -> 雙振盪器金屬計時鈴聲（叮叮兩短音）
+        // 雙振盪器金屬計時鈴聲（叮叮兩短音）
         function playThirtySecondsSound() {
             if (!audioCtx) return;
             
@@ -486,26 +612,17 @@
             osc.stop(audioCtx.currentTime + 3.0); 
         }
 
-        // 新增：根據當前時間與初始時間動態切換顯示顏色
+        // 根據當前時間與初始時間動態切換顯示顏色
         function applyDisplayColor() {
-            if (totalSeconds <= 0) {
-                return; // 時間到由主流程接管樣式
-            }
-            
-            // 1. 優先判定是否進入倒數 10 秒 -> 紅橙色
+            if (totalSeconds <= 0) return;
             if (totalSeconds <= 10) {
                 display.style.color = "#ff5722"; 
                 return;
             }
-            
-            // 計算已過去的秒數
             let elapsed = initialTotalSeconds - totalSeconds;
-            
-            // 2. 如果尚未開始，或在 30 秒內 -> 綠色
             if (elapsed <= 30) {
                 display.style.color = "#38a169"; 
             } else {
-                // 3. 超過 30 秒且未到最後 10 秒 -> 黑色
                 display.style.color = "#1a202c"; 
             }
         }
@@ -523,12 +640,14 @@
             let m = parseInt(inputMin.value) || 0;
             let s = parseInt(inputSec.value) || 0;
             totalSeconds = (m * 60) + s;
-            initialTotalSeconds = totalSeconds; // 自訂輸入時即時更新初始參考值
+            initialTotalSeconds = totalSeconds; 
             updateDisplay(totalSeconds);
             
             display.classList.remove('time-up'); 
             applyDisplayColor();
             btnToggle.disabled = totalSeconds <= 0;
+            // 自訂輸入後若有效，按鈕文字應為 "開始 / Start"
+            if (totalSeconds > 0) setToggleState('start');
         }
 
         function switchMode() {
@@ -537,7 +656,7 @@
 
             if (currentMode === 'random') {
                 currentMode = 'custom';
-                btnMode.innerHTML = "切換至 🎲 隨機 Timer 模式";
+                btnMode.innerHTML = dict[currentLang]['mode-random'];
                 btnDraw.style.display = 'none';
                 customArea.style.display = 'flex';
                 
@@ -552,7 +671,7 @@
                 btnToggle.disabled = true;
             } else {
                 currentMode = 'random';
-                btnMode.innerHTML = "切換至 ⚙️ 自訂 Timer 模式";
+                btnMode.innerHTML = dict[currentLang]['mode-custom'];
                 btnDraw.style.display = 'block';
                 customArea.style.display = 'none';
                 
@@ -571,13 +690,13 @@
 
         function setToggleState(state) {
             if (state === 'start') {
-                btnToggle.innerHTML = "▶️ 開始";
+                btnToggle.innerHTML = dict[currentLang]['btn-start'];
                 btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
             } else if (state === 'pause') {
-                btnToggle.innerHTML = "⏸️ 暫停";
+                btnToggle.innerHTML = dict[currentLang]['btn-pause'];
                 btnToggle.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)"; 
             } else if (state === 'resume') {
-                btnToggle.innerHTML = "▶️ 繼續";
+                btnToggle.innerHTML = dict[currentLang]['btn-resume'];
                 btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
             }
         }
@@ -587,7 +706,7 @@
             if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
             totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-            initialTotalSeconds = totalSeconds; // 抽取時間時鎖定初始參考值
+            initialTotalSeconds = totalSeconds; 
             display.classList.remove('time-up'); 
             updateDisplay(totalSeconds);
             applyDisplayColor();
@@ -630,13 +749,12 @@
                     inputSec.disabled = true;
                 }
 
-                // 啟動時立刻對齊一次顏色
                 applyDisplayColor();
 
                 timerInterval = setInterval(function () {
                     totalSeconds--;
                     updateDisplay(totalSeconds);
-                    applyDisplayColor(); // 每秒動態檢查並更新顏色
+                    applyDisplayColor(); 
 
                     if (initialTotalSeconds - totalSeconds === 30) {
                         playThirtySecondsSound();
@@ -652,7 +770,7 @@
                         isPaused = false;
                         
                         display.classList.add('time-up');
-                        display.textContent = "時間到！";
+                        display.textContent = dict[currentLang]['time-up'];
                         display.style.color = "#e53e3e"; 
                         
                         setToggleState('start');
@@ -702,8 +820,8 @@
         // ================= 鍵盤快捷鍵邏輯 =================
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space' || e.code === 'Enter') {
-                if (document.activeElement.tagName === 'INPUT' && e.code === 'Space') {
-                    return; 
+                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+                    if (e.code === 'Space') return; 
                 }
                 e.preventDefault(); 
                 if (!btnToggle.disabled) {
