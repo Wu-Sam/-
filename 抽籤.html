@@ -247,7 +247,7 @@
     </div>
 
     <div class="timer-card">
-        <button id="btn-mode" onclick="switchMode()">切換至 ⚙️ 自訂模式</button>
+        <button id="btn-mode" onclick="switchMode()">切換至 ⚙️ 自訂 Timer 模式</button>
         
         <div id="display">00:00</div>
         
@@ -390,7 +390,7 @@
 
             if (currentMode === 'random') {
                 currentMode = 'custom';
-                btnMode.innerHTML = "切換至 🎲 隨機模式";
+                btnMode.innerHTML = "切換至 🎲 隨機 Timer模式";
                 btnDraw.style.display = 'none';
                 customArea.style.display = 'flex';
                 updateCustomDisplay(); 
