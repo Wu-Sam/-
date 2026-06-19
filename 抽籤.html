@@ -3,85 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>計時器與硬幣工具</title>
+    <title>溪南國中 - 計時器與硬幣工具</title>
     <style>
         /* 全局背景與字體設定 */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e6fffa 0%, #e2e8f0 100%);
             height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden; /* 防止側欄出現時產生水平捲動條 */
+            overflow-x: hidden; 
+        }
+
+        /* 右上角學校專屬 Header 區域 */
+        .top-right-header {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        /* 溪南國中徽章樣式 */
+        .school-badge {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c5282;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 9px 18px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 側欄開關按鈕美化 */
+        #sidebar-toggle {
+            position: static; /* 解除原本的 fixed 定位，交由父層 flex 排版 */
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            width: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #sidebar-toggle:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
         /* 計時器主體卡片設計 */
         .timer-card {
             background-color: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            padding: 45px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             text-align: center;
             width: 450px; 
             z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         #btn-mode {
-            background-color: #edf2f7;
+            background-color: #f7fafc;
             color: #4a5568;
-            border: 1px solid #cbd5e0;
-            padding: 8px 15px;
-            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+            padding: 8px 18px;
+            font-size: 0.95rem;
             border-radius: 20px;
             margin-bottom: 25px;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        #btn-mode:hover { background-color: #e2e8f0; }
+        #btn-mode:hover { 
+            background-color: #edf2f7; 
+            color: #2d3748;
+        }
 
         #display {
             font-size: 7.5rem;
             font-weight: bold;
-            color: #2d3748;
-            background-color: #edf2f7;
-            padding: 15px 10px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: color 0.3s, font-size 0.2s; /* 讓字體縮放時有平滑過渡 */
+            color: #1a202c;
+            background-color: #f7fafc;
+            padding: 20px 10px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.06);
+            transition: color 0.3s, font-size 0.2s, background-color 0.3s; 
             line-height: 1; 
-            white-space: nowrap; /* 強迫文字絕對保持在同一排 */
+            white-space: nowrap; 
             overflow: hidden;
+            border: 1px solid #edf2f7;
         }
 
-        /* 當時間到時，縮小字體確保「時間到！」在 card 內完美變一排 */
+        /* 當時間到時的視覺震撼感 */
         #display.time-up {
             font-size: 4.2rem;
             letter-spacing: 0px;
-            padding: 40px 10px; /* 微調上下邊距讓視覺更平衡 */
+            padding: 46px 10px; 
+            background-color: #fff5f5;
         }
 
         .custom-input-area {
             display: none; 
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 1.1rem;
         }
         .custom-input-area input {
-            width: 70px;
+            width: 75px;
             padding: 10px;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: bold;
             text-align: center;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 12px;
             outline: none;
+            color: #2d3748;
+            transition: border-color 0.2s;
+            background-color: #f7fafc;
         }
-        .custom-input-area input:focus { border-color: #667eea; }
+        .custom-input-area input:focus { border-color: #667eea; background-color: #fff; }
 
         .button-group {
             display: flex;
@@ -95,47 +157,34 @@
 
         button {
             border: none;
-            padding: 15px 20px;
+            padding: 16px 20px;
             font-size: 1.2rem;
             font-weight: bold;
-            border-radius: 10px;
+            border-radius: 14px;
             cursor: pointer;
             color: white;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
         }
-        button:active { transform: scale(0.96); }
+        button:active { transform: scale(0.96) !important; }
         button:disabled {
-            background-color: #cbd5e0 !important;
+            background: #cbd5e0 !important;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
-        #btn-draw { background-color: #667eea; }
-        #btn-draw:hover:not(:disabled) { background-color: #5a67d8; }
-        #btn-toggle { background-color: #48bb78; }
-        #btn-toggle:hover:not(:disabled) { filter: brightness(0.9); }
-        #btn-reset { background-color: #f56565; }
-        #btn-reset:hover:not(:disabled) { background-color: #e53e3e; }
+        #btn-draw { background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%); }
+        #btn-draw:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(90, 103, 216, 0.3); }
+        
+        #btn-toggle { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        #btn-toggle:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(56, 161, 105, 0.3); }
+        
+        #btn-reset { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); }
+        #btn-reset:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.3); }
 
         /* 側欄 (Sidebar) 設計 */
-        #sidebar-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #4a5568;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 1rem;
-            z-index: 100;
-            width: auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        #sidebar-toggle:hover { background-color: #2d3748; }
-
         .sidebar {
             position: fixed;
             top: 0;
@@ -143,10 +192,10 @@
             width: 320px;
             height: 100%;
             background-color: white;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.1);
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 90;
-            padding: 80px 20px 20px 20px;
+            padding: 90px 20px 20px 20px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -156,34 +205,33 @@
         }
 
         .sidebar h3 {
-            margin: 0 0 15px 0;
+            margin: 0 0 18px 0;
             color: #2d3748;
             font-size: 1.4rem;
             text-align: center;
+            letter-spacing: 1px;
         }
 
-        /* 側欄頁籤切換按鈕設計 */
         .tab-container {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             background-color: #edf2f7;
             padding: 5px;
-            border-radius: 12px;
+            border-radius: 14px;
         }
         .tab-btn {
             background-color: transparent;
             color: #4a5568;
             padding: 10px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-shadow: none;
-            border-radius: 8px;
+            border-radius: 10px;
         }
         .tab-btn:hover { background-color: #e2e8f0; }
-        .tab-btn.active-orange { background-color: #ed8936; color: white; }
-        .tab-btn.active-purple { background-color: #9f7aea; color: white; }
+        .tab-btn.active-orange { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; }
+        .tab-btn.active-purple { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; }
 
-        /* 分頁容器 */
         .page-content {
             display: none; 
             flex-direction: column;
@@ -195,37 +243,38 @@
 
         .coin-box {
             background-color: #f7fafc;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 15px;
             text-align: center;
             border: 1px solid #e2e8f0;
         }
 
-        .btn-orange { background-color: #ed8936; font-size: 1rem; padding: 10px; }
-        .btn-orange:hover { background-color: #dd6b20; }
+        .btn-orange { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); font-size: 1rem; padding: 12px; }
+        .btn-orange:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(221, 107, 32, 0.3); }
         
-        .btn-purple { background-color: #9f7aea; font-size: 1rem; padding: 10px; }
-        .btn-purple:hover { background-color: #805ad5; }
+        .btn-purple { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); font-size: 1rem; padding: 12px; }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(128, 90, 213, 0.3); }
 
-        /* 硬幣結果顯示區 */
         .result-box {
-            background-color: #2d3748;
+            background-color: #1a202c;
             color: #f7fafc;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 18px;
+            border-radius: 14px;
             min-height: 120px;
             font-size: 1.1rem;
             line-height: 1.8;
             text-align: left;
-            font-family: monospace;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
         }
-
     </style>
 </head>
 <body>
 
-    <button id="sidebar-toggle" onclick="toggleSidebar()">☰ 附加工具</button>
+    <div class="top-right-header">
+        <div class="school-badge">🏫 溪南國中 SNJH</div>
+        <button id="sidebar-toggle" onclick="toggleSidebar()">☰ 附加工具</button>
+    </div>
 
     <div id="sidebar" class="sidebar">
         <h3>🪙 硬幣擲球</h3>
@@ -252,7 +301,6 @@
                 請點擊上方按鈕開始擲紫球...
             </div>
         </div>
-
     </div>
 
     <div class="timer-card">
@@ -276,7 +324,6 @@
 
     <script>
         // ================= 硬幣側欄邏輯 =================
-
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
@@ -308,7 +355,6 @@
                 let isHeads = Math.random() < 0.5; 
                 results.push(isHeads ? "前" : "後");
             }
-            
             const resultBox = document.getElementById('result-orange');
             resultBox.innerHTML = `
                 <span style="color:#f6ad55; font-weight:bold;">橘球位置:</span><br>
@@ -322,10 +368,8 @@
         function tossPurple() {
             let coin1Heads = Math.random() < 0.5;
             let coin2Heads = Math.random() < 0.5;
-
             let pos1 = coin1Heads ? "左" : "右";
             let pos2 = coin2Heads ? "左" : "右";
-
             const resultBox = document.getElementById('result-purple');
             resultBox.innerHTML = `
                 <span style="color:#b794f4; font-weight:bold;">紫球位置:</span><br>
@@ -359,12 +403,10 @@
             
             osc.connect(gainNode);
             gainNode.connect(ctx.destination);
-            
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, ctx.currentTime); 
             gainNode.gain.setValueAtTime(1.0, ctx.currentTime); 
             gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); 
-            
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.1);
         }
@@ -377,10 +419,8 @@
             for (let i = 0; i < 2; i++) {
                 const osc = ctx.createOscillator();
                 const gainNode = ctx.createGain();
-                
                 osc.connect(gainNode);
                 gainNode.connect(ctx.destination);
-                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, ctx.currentTime + (i * 1.1)); 
                 
@@ -388,7 +428,6 @@
                 gainNode.gain.setValueAtTime(1.0, startTime); 
                 gainNode.gain.setValueAtTime(1.0, startTime + 0.75); 
                 gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8); 
-                
                 osc.start(startTime);
                 osc.stop(startTime + 0.8);
             }
@@ -410,14 +449,14 @@
             updateDisplay(totalSeconds);
             
             display.classList.remove('time-up'); 
-            display.style.color = "#2d3748";
+            display.style.color = "#1a202c";
             btnToggle.disabled = totalSeconds <= 0;
         }
 
-        // 核心修改：切換模式時「自動強制 RESET 歸零」
+        // 切換模式自動 RESET 歸零
         function switchMode() {
             if (isRunning) return; 
-            if (autoResetTimeout) clearTimeout(autoResetTimeout); // 清除10秒自動重置倒數
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
 
             if (currentMode === 'random') {
                 currentMode = 'custom';
@@ -425,7 +464,6 @@
                 btnDraw.style.display = 'none';
                 customArea.style.display = 'flex';
                 
-                // 自動 RESET 為自訂模式的初始值 00:00
                 inputMin.value = 0;
                 inputSec.value = 0;
                 inputMin.disabled = false;
@@ -439,16 +477,14 @@
                 btnDraw.style.display = 'block';
                 customArea.style.display = 'none';
                 
-                // 自動 RESET 為隨機模式的初始值 00:00
                 totalSeconds = 0;
                 updateDisplay(0);
                 btnDraw.disabled = false;
                 btnToggle.disabled = true;
             }
             
-            // 通用畫面還原
             display.classList.remove('time-up');
-            display.style.color = "#2d3748"; 
+            display.style.color = "#1a202c"; 
             setToggleState('start');
             isPaused = false;
         }
@@ -456,13 +492,13 @@
         function setToggleState(state) {
             if (state === 'start') {
                 btnToggle.innerHTML = "▶️ 開始";
-                btnToggle.style.backgroundColor = "#48bb78"; 
+                btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
             } else if (state === 'pause') {
                 btnToggle.innerHTML = "⏸️ 暫停";
-                btnToggle.style.backgroundColor = "#ed8936"; 
+                btnToggle.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)"; 
             } else if (state === 'resume') {
                 btnToggle.innerHTML = "▶️ 繼續";
-                btnToggle.style.backgroundColor = "#48bb78"; 
+                btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
             }
         }
 
@@ -473,7 +509,7 @@
             totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
             display.classList.remove('time-up'); 
             updateDisplay(totalSeconds);
-            display.style.color = "#2d3748";
+            display.style.color = "#1a202c";
             btnToggle.disabled = false;
             setToggleState('start');
             isPaused = false;
@@ -539,6 +575,7 @@
                         
                         playEndSound();
 
+                        // 10秒自動回到0:00
                         autoResetTimeout = setTimeout(function() {
                             resetTimer();
                         }, 10000);
@@ -567,7 +604,7 @@
                 inputSec.disabled = false;
             }
             
-            display.style.color = "#2d3748"; 
+            display.style.color = "#1a202c"; 
             setToggleState('start');
         }
 
@@ -577,15 +614,12 @@
                 if (document.activeElement.tagName === 'INPUT' && e.code === 'Space') {
                     return; 
                 }
-
                 e.preventDefault(); 
-
                 if (!btnToggle.disabled) {
                     toggleTimer();
                 }
             }
         });
     </script>
-
 </body>
 </html>
