@@ -381,6 +381,10 @@
             </div>
             <button class="btn-reset-coin" onclick="resetCoin('purple')" data-i18n="btn-reset-coin">🔄 清除結果</button>
         </div>
+        
+        <button id="installBtn" style="display: none; width: 56px !important; height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 0 !important; background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%) !important; color: white !important; border: none !important; border-radius: 50% !important; cursor: pointer !important; margin: 20px auto 0 auto !important; font-size: 1.6rem !important; justify-content: center !important; align-items: center !important; box-shadow: 0 4px 10px rgba(43, 108, 176, 0.3) !important; flex: none !important; transform: none !important;">
+            📥
+        </button>
     </div>
 
     <div class="timer-card">
@@ -401,9 +405,6 @@
             </div>
         </div>
         <h5 style="text-align: center;">SN</h5>
-        <button id="installBtn" style="display: none; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 auto;">
-            安裝離線版本
-        </button>
     </div>
 
     <script>
@@ -946,52 +947,68 @@
             }
         }
 
-        // ================= PWA 離線版本安裝與隱藏邏輯 =================
+        // ================= PWA 離線版本安裝與隱藏邏輯 (支援 iOS) =================
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
 
-        // 1. 監聽瀏覽器的安裝提示事件
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // 阻止 Android Chrome 預設的自動彈出底欄提示
-            e.preventDefault();
-            // 將事件儲存起來
-            deferredPrompt = e;
-            
-            // 如果目前不是在「已安裝的獨立 App 視窗」模式下，就讓按鈕顯示
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
+        // 偵測是否為 iOS 裝置 (iPhone/iPad)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        // 判斷是否已經安裝並開啟 (獨立視窗模式)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+        // 初始化顯示邏輯
+        if (!isStandalone) {
+            if (isIOS) {
+                // 如果是 iOS 且未安裝，直接顯示按鈕，並修改文字來引導使用者
                 installBtn.style.display = 'block';
+                // 根據你目前選擇的語言，也可以用 dict 動態更新。這裡先預設中文引導：
+                installBtn.innerHTML = '📲 iPhone 安裝教學 (點擊查看)';
+            }
+        }
+
+        // 1. 監聽 Android/電腦 瀏覽器的安裝提示事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!isStandalone) {
+                installBtn.style.display = 'block';
+                // 恢復成標準的安裝文字 (避免 iOS 的文字影響到 Android)
+                if (!isIOS) {
+                    installBtn.innerHTML = dict[currentLang]['btn-install'] || '📲 下載離線 App 版本';
+                }
             }
         });
 
-        // 2. 當使用者點擊「安裝離線版本」按鈕時觸發
+        // 2. 當使用者點擊按鈕時觸發
         installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            
-            // 初始化音效，順便解鎖 PWA 模式下的 Web Audio
+            // 解鎖音效
             if (typeof initAudio === 'function') initAudio();
-            
-            // 跳出瀏覽器原生的安裝確認視窗
+
+            // 如果是 iOS 裝置，點擊後彈出提示訊息，教導如何加入主畫面
+            if (isIOS) {
+                alert('【iPhone / iPad 安裝 PWA 提示】\n\n1. 如果您目前使用 Chrome，請點擊網址列右側的「分享」按鈕，並尋找「加入主畫面」。\n\n2. 若 Chrome 沒有該選項，請複製網址改用「Safari 瀏覽器」開啟，點擊底部的「分享 📤」圖示，然後選擇「加入主畫面 ➕」即可完成安裝！');
+                return;
+            }
+
+            // 以下為 Android / 電腦版的標準安裝流程
+            if (!deferredPrompt) return;
             deferredPrompt.prompt();
-            
-            // 等待使用者按下確認或取消
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`使用者安裝選擇: ${outcome}`);
-            
-            // 清除暫存的提示，並立刻隱藏按鈕
             deferredPrompt = null;
             installBtn.style.display = 'none';
         });
 
-        // 3. 確保網頁載入時，如果是從桌面圖示打開（獨立視窗），按鈕絕對保持隱藏
+        // 3. 確保網頁從桌面打開時，按鈕絕對隱藏
         window.addEventListener('DOMContentLoaded', () => {
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 installBtn.style.display = 'none';
             }
         });
 
-        // 4. 監聽安裝成功事件（當使用者成功安裝到手機或電腦桌面後觸發）
+        // 4. 監聽安裝成功事件
         window.addEventListener('appinstalled', (evt) => {
-            console.log('WRO RoboSports PWA 已成功安裝！');
             installBtn.style.display = 'none';
         });
     </script>
