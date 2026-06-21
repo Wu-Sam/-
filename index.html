@@ -83,13 +83,17 @@
         /* 計時器主體卡片 */
         .timer-card {
             background-color: white;
-            padding: 45px 40px;
+            padding: 43px 40px;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             text-align: center;
             width: 450px; 
             z-index: 10;
             border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .timer-card > h4 {
+            color: #bbbdbe;
         }
 
         #btn-mode {
@@ -388,7 +392,7 @@
                 <button id="btn-reset" onclick="resetTimer()" data-i18n="btn-reset">🔄 RESET</button>
             </div>
         </div>
-        <h4 style="text-align: center;">SN</h4>
+        <h5 style="text-align: center;">SN</h5>
     </div>
 
     <script>
