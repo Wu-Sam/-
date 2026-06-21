@@ -381,7 +381,7 @@
                 <button class="btn-purple" onclick="tossPurple()" data-i18n="btn-toss-purple">抽 紫球 (隨機1~4道)</button>
             </div>
             <div id="result-purple" class="result-box" data-i18n="res-purple-init">
-                請點擊上方按鈕開始擲紫球...
+                請點擊上方按鈕開始隨機抽籤...
             </div>
             <button class="btn-reset-coin" onclick="resetCoin('purple')" data-i18n="btn-reset-coin">🔄 清除結果</button>
          </div>
@@ -424,7 +424,7 @@
                 'btn-toss-orange': '擲 橘球',
                 'res-orange-init': '請點擊上方按鈕開始擲橘球...',
                 'btn-toss-purple': '抽 紫球 (隨機1~4道)',
-                'res-purple-init': '請點擊上方按鈕開始擲紫球...',
+                'res-purple-init': '請點擊上方按鈕開始隨機抽籤...',
                 'btn-reset-coin': '🔄 清除結果',
                 'mode-custom': '切換至 ⚙️ 自訂 Timer 模式',
                 'mode-random': '切換至 🎲 隨機 Timer 模式',
@@ -432,6 +432,590 @@
                 'sec': '秒',
                 'btn-draw': '🎲 抽取時間 (1~2分鐘)',
                 'btn-reset-random': '🔄 歸零秒數',
-                'btn-start': '▶️ 開始'
+                'btn-start': '▶️ 開始',
+                'btn-pause': '⏸️ 暫停',
+                'btn-resume': '▶️ 繼續',
+                'btn-reset': '🔄 RESET',
+                'time-up': '時間到！',
+                'front': 'A',
+                'back': 'B'
+            },
+            'en': {
+                'title': '🎾RoboSports - Timer & Coin Tool',
+                'badge': '🎾RoboSports',
+                'tools': '☰',
+                'rules': '📜 Rules',
+                'coin-title': '🪙 Coin Toss',
+                'tab-orange': '🟠 Orange',
+                'tab-purple': '🟣 Purple',
+                'btn-toss-orange': 'Toss Orange (4 Coins)',
+                'res-orange-init': 'Click the button above to toss...',
+                'btn-toss-purple': 'Draw Purple (1~4)',
+                'res-purple-init': 'Click the button above to draw...',
+                'btn-reset-coin': '🔄 Clear Result',
+                'mode-custom': 'Switch to ⚙️ Custom Timer',
+                'mode-random': 'Switch to 🎲 Random Timer',
+                'min': 'Min',
+                'sec': 'Sec',
+                'btn-draw': '🎲 Draw Time (1~2 Min)',
+                'btn-reset-random': '🔄 Reset Time',
+                'btn-start': '▶️ Start',
+                'btn-pause': '⏸️ Pause',
+                'btn-resume': '▶️ Resume',
+                'btn-reset': '🔄 RESET',
+                'time-up': 'Time\'s Up!',
+                'front': 'A',
+                'back': 'B'
+            },
+            'jp': {
+                'title': '🎾RoboSports - タイマーとコインツール',
+                'badge': '🎾RoboSports',
+                'tools': '☰',
+                'rules': '📜 ルール',
+                'coin-title': '🪙 コイントス',
+                'tab-orange': '🟠 オレンジ',
+                'tab-purple': '🟣 パープル',
+                'btn-toss-orange': 'オレンジを投げる (4枚)',
+                'res-orange-init': '上のボタンをクリックして開始...',
+                'btn-toss-purple': 'パープルを引く (1~4)',
+                'res-purple-init': '上のボタンをクリックして抽選...',
+                'btn-reset-coin': '🔄 結果をクリア',
+                'mode-custom': '⚙️ カスタムタイマーに切替',
+                'mode-random': '🎲 ランダムタイマーに切替',
+                'min': '分',
+                'sec': '秒',
+                'btn-draw': '🎲 時間を引く (1~2分)',
+                'btn-reset-random': '🔄 時間リセット',
+                'btn-start': '▶️ 開始',
+                'btn-pause': '⏸️ 一時停止',
+                'btn-resume': '▶️ 再開',
+                'btn-reset': '🔄 リセット',
+                'time-up': '時間終了！',
+                'front': 'A',
+                'back': 'B'
+            },
+            'vi': {
+                'title': '🎾RoboSports - Hẹn giờ & Tung đồng xu',
+                'badge': '🎾RoboSports',
+                'tools': '☰',
+                'rules': '📜 Luật',
+                'coin-title': '🪙 Tung đồng xu',
+                'tab-orange': '🟠 Bóng cam',
+                'tab-purple': '🟣 Bóng tím',
+                'btn-toss-orange': 'Tung bóng cam (4 đồng xu)',
+                'res-orange-init': 'Nhấp vào nút phía trên để tung...',
+                'btn-toss-purple': 'Rút bóng tím (Ngẫu nhiên 1~4)',
+                'res-purple-init': 'Nhấp vào nút phía trên để rút...',
+                'btn-reset-coin': '🔄 Xóa kết quả',
+                'mode-custom': 'Chuyển sang ⚙️ Hẹn giờ tùy chỉnh',
+                'mode-random': 'Chuyển sang 🎲 Hẹn giờ ngẫu nhiên',
+                'min': 'Phút',
+                'sec': 'Giây',
+                'btn-draw': '🎲 Rút thời gian (1~2 Phút)',
+                'btn-reset-random': '🔄 Đặt lại Giờ',
+                'btn-start': '▶️ Bắt đầu',
+                'btn-pause': '⏸️ Tạm dừng',
+                'btn-resume': '▶️ Tiếp tục',
+                'btn-reset': '🔄 Đặt lại',
+                'time-up': 'Hết giờ!',
+                'front': 'A',
+                'back': 'B'
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function changeLanguage() {
+            currentLang = document.getElementById('lang-select').value;
+            document.title = dict[currentLang]['title'];
+
+            // 更新所有帶有 data-i18n 的靜態元素
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[currentLang][key]) {
+                    el.textContent = dict[currentLang][key];
                 }
+            });
+
+            // 更新動態狀態文字：模式按鈕
+            if (currentMode === 'random') {
+                btnMode.innerHTML = dict[currentLang]['mode-custom'];
+            } else {
+                btnMode.innerHTML = dict[currentLang]['mode-random'];
+            }
+
+            // 更新動態狀態文字：開始/暫停按鈕
+            if (!isRunning && !isPaused && totalSeconds > 0) {
+                btnToggle.innerHTML = dict[currentLang]['btn-start'];
+            } else if (isRunning) {
+                btnToggle.innerHTML = dict[currentLang]['btn-pause'];
+            } else if (isPaused) {
+                btnToggle.innerHTML = dict[currentLang]['btn-resume'];
+            }
+
+            // 如果畫面上正好是「時間到」，切換語言時也要跟著換
+            if (display.classList.contains('time-up')) {
+                display.textContent = dict[currentLang]['time-up'];
+            }
+
+            // 重置硬幣結果面板以對齊語言
+            let orangeRes = document.getElementById('result-orange');
+            if (orangeRes.innerHTML.indexOf('table-box') === -1) {
+                orangeRes.textContent = dict[currentLang]['res-orange-init'];
+            }
+            
+            let purpleRes = document.getElementById('result-purple');
+            if (purpleRes.innerHTML.indexOf('table-box') === -1) {
+                purpleRes.textContent = dict[currentLang]['res-purple-init'];
+            }
         }
+
+        // ================= 硬幣側欄邏輯 =================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function switchTab(mode) {
+            const pageOrange = document.getElementById('page-orange');
+            const pagePurple = document.getElementById('page-purple');
+            const tabOrange = document.getElementById('tab-orange');
+            const tabPurple = document.getElementById('tab-purple');
+
+            pageOrange.classList.remove('active');
+            pagePurple.classList.remove('active');
+            tabOrange.classList.remove('active-orange');
+            tabPurple.classList.remove('active-purple');
+            if (mode === 'orange') {
+                pageOrange.classList.add('active');
+                tabOrange.classList.add('active-orange');
+            } else {
+                pagePurple.classList.add('active');
+                tabPurple.classList.add('active-purple');
+            }
+        }
+
+        function tossOrange() {
+            let results = [];
+            let tFront = dict[currentLang]['front'];
+            let tBack = dict[currentLang]['back'];
+            
+            for(let i = 0; i < 4; i++) {
+                let isHeads = Math.random() < 0.5;
+                results.push(isHeads ? tFront : tBack);
+            }
+            
+            const resultBox = document.getElementById('result-orange');
+            resultBox.innerHTML = `
+                <div class="table-box">
+                    <div class="cell-head">1</div>
+                    <div class="cell-head">2</div>
+                    <div class="cell-head">3</div>
+                    <div class="cell-head">4</div>
+                    <div class="cell-body">${results[0]}</div>
+                    <div class="cell-body">${results[1]}</div>
+                    <div class="cell-body">${results[2]}</div>
+                    <div class="cell-body">${results[3]}</div>
+                </div>
+            `;
+        }
+
+        function tossPurple() {
+            let randIndex = Math.floor(Math.random() * 4); 
+            
+            const langOptions = [
+                "1",
+                "2",
+                "3",
+                "4"
+            ];
+
+            let results = ['', '', '', ''];
+            results[randIndex] = langOptions[randIndex];
+
+            const resultBox = document.getElementById('result-purple');
+            resultBox.innerHTML = `
+                <div class="table-box">
+                    <div class="cell-head">1</div>
+                    <div class="cell-head">2</div>
+                    <div class="cell-head">3</div>
+                    <div class="cell-head">4</div>
+                    <div class="cell-body" style="color: #d6bcfa;">${results[0]}</div>
+                    <div class="cell-body" style="color: #d6bcfa;">${results[1]}</div>
+                    <div class="cell-body" style="color: #d6bcfa;">${results[2]}</div>
+                    <div class="cell-body" style="color: #d6bcfa;">${results[3]}</div>
+                </div>
+            `;
+        }
+
+        function resetCoin(mode) {
+            if (mode === 'orange') {
+                document.getElementById('result-orange').textContent = dict[currentLang]['res-orange-init'];
+            } else if (mode === 'purple') {
+                document.getElementById('result-purple').textContent = dict[currentLang]['res-purple-init'];
+            }
+        }
+
+        // ================= 計時器與手機音效解鎖邏輯 =================
+        let timerInterval;
+        let autoResetTimeout; 
+        let totalSeconds = 0;
+        let initialTotalSeconds = 0; 
+        let isRunning = false;
+        let isPaused = false;
+        let currentMode = 'random'; 
+        
+        let audioCtx = null; 
+
+        const display = document.getElementById('display');
+        const btnMode = document.getElementById('btn-mode');
+        const btnDraw = document.getElementById('btn-draw');
+        const customArea = document.getElementById('custom-area');
+        const btnToggle = document.getElementById('btn-toggle');
+        const inputMin = document.getElementById('input-min');
+        const inputSec = document.getElementById('input-sec');
+        
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playThirtySecondsSound() {
+            if (!audioCtx) return;
+            function ringSingleBell(startTime) {
+                const oscBase = audioCtx.createOscillator();
+                const oscHigh = audioCtx.createOscillator();
+                const gainBase = audioCtx.createGain();
+                const gainHigh = audioCtx.createGain();
+                
+                oscBase.connect(gainBase);
+                gainBase.connect(audioCtx.destination);
+                oscHigh.connect(gainHigh);
+                gainHigh.connect(audioCtx.destination);
+                
+                oscBase.type = 'triangle';
+                oscBase.frequency.setValueAtTime(1200, startTime); 
+                
+                oscHigh.type = 'sine';
+                oscHigh.frequency.setValueAtTime(2500, startTime); 
+                
+                gainBase.gain.setValueAtTime(0.8, startTime);
+                gainBase.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3); 
+                
+                gainHigh.gain.setValueAtTime(0.6, startTime);
+                gainHigh.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15); 
+                
+                oscBase.start(startTime);
+                oscBase.stop(startTime + 0.35);
+                oscHigh.start(startTime);
+                oscHigh.stop(startTime + 0.2);
+            }
+
+            let now = audioCtx.currentTime;
+            ringSingleBell(now);          
+            ringSingleBell(now + 0.18);   
+        }
+
+        function playCountdownBeep() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime); 
+            
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime + 0.15); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2); 
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+
+        function playEndSound() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime + 2.5); 
+            gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 3.0); 
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 3.0);
+        }
+
+        function applyDisplayColor() {
+            if (totalSeconds <= 0) return;
+            if (totalSeconds <= 10) {
+                display.style.color = "#ff5722";
+                return;
+            }
+            let elapsed = initialTotalSeconds - totalSeconds;
+            if (elapsed <= 30) {
+                display.style.color = "#38a169";
+            } else {
+                display.style.color = "#1a202c";
+            }
+        }
+
+        function updateDisplay(seconds) {
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+            m = m < 10 ? "0" + m : m;
+            s = s < 10 ? "0" + s : s;
+            display.textContent = m + ":" + s;
+        }
+
+        function updateCustomDisplay() {
+            if (isRunning || isPaused) return;
+            let m = parseInt(inputMin.value) || 0;
+            let s = parseInt(inputSec.value) || 0;
+            totalSeconds = (m * 60) + s;
+            initialTotalSeconds = totalSeconds; 
+            updateDisplay(totalSeconds);
+            
+            display.classList.remove('time-up'); 
+            applyDisplayColor();
+            btnToggle.disabled = totalSeconds <= 0;
+            if (totalSeconds > 0) setToggleState('start');
+        }
+
+        function switchMode() {
+            if (isRunning) return;
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
+            if (currentMode === 'random') {
+                currentMode = 'custom';
+                btnMode.innerHTML = dict[currentLang]['mode-random'];
+                
+                btnDraw.style.display = 'none';
+                document.getElementById('btn-reset-random').style.display = 'none';
+                
+                customArea.style.display = 'flex';
+                
+                inputMin.value = 0;
+                inputSec.value = 0;
+                inputMin.disabled = false;
+                inputSec.disabled = false;
+                totalSeconds = 0;
+                initialTotalSeconds = 0;
+                updateDisplay(0);
+                display.style.color = "#1a202c";
+                btnToggle.disabled = true;
+            } else {
+                currentMode = 'random';
+                btnMode.innerHTML = dict[currentLang]['mode-custom'];
+                
+                btnDraw.style.display = 'block';
+                document.getElementById('btn-reset-random').style.display = 'block';
+                
+                customArea.style.display = 'none';
+                
+                totalSeconds = 0;
+                initialTotalSeconds = 0;
+                updateDisplay(0);
+                display.style.color = "#1a202c";
+                btnDraw.disabled = false;
+                document.getElementById('btn-reset-random').disabled = false;
+                btnToggle.disabled = true;
+            }
+            
+            display.classList.remove('time-up');
+            setToggleState('start');
+            isPaused = false;
+        }
+
+        function setToggleState(state) {
+            if (state === 'start') {
+                btnToggle.innerHTML = dict[currentLang]['btn-start'];
+                btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
+            } else if (state === 'pause') {
+                btnToggle.innerHTML = dict[currentLang]['btn-pause'];
+                btnToggle.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)"; 
+            } else if (state === 'resume') {
+                btnToggle.innerHTML = dict[currentLang]['btn-resume'];
+                btnToggle.style.background = "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"; 
+            }
+        }
+
+        function drawTime() {
+            if (isRunning) return;
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
+            totalSeconds = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            initialTotalSeconds = totalSeconds; 
+            display.classList.remove('time-up'); 
+            updateDisplay(totalSeconds);
+            applyDisplayColor();
+            btnToggle.disabled = false;
+            setToggleState('start');
+            isPaused = false;
+        }
+
+        function resetRandomOnly() {
+            clearInterval(timerInterval);
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+            isRunning = false;
+            isPaused = false;
+            
+            totalSeconds = 0;
+            initialTotalSeconds = 0;
+            updateDisplay(0);
+            
+            display.classList.remove('time-up');
+            display.style.color = "#1a202c";
+            
+            btnToggle.disabled = true;
+            setToggleState('start');
+            btnMode.disabled = false;
+            btnDraw.disabled = false;
+        }
+
+        function toggleTimer() {
+            if (totalSeconds <= 0) return;
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
+            initAudio(); 
+
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                isPaused = true;
+                setToggleState('resume');
+                btnMode.disabled = false; 
+                
+                if (currentMode === 'random') {
+                    btnDraw.disabled = false;
+                    document.getElementById('btn-reset-random').disabled = false;
+                }
+                if (currentMode === 'custom') {
+                    inputMin.disabled = false;
+                    inputSec.disabled = false;
+                }
+            } else {
+                isRunning = true;
+                if (!isPaused) {
+                    initialTotalSeconds = totalSeconds;
+                }
+                isPaused = false;
+                setToggleState('pause');
+                btnMode.disabled = true; 
+                btnDraw.disabled = true; 
+                document.getElementById('btn-reset-random').disabled = true; 
+                
+                if (currentMode === 'custom') {
+                    inputMin.disabled = true;
+                    inputSec.disabled = true;
+                }
+
+                applyDisplayColor();
+                timerInterval = setInterval(function () {
+                    totalSeconds--;
+                    updateDisplay(totalSeconds);
+                    applyDisplayColor(); 
+
+                    if (initialTotalSeconds - totalSeconds === 30) {
+                        playThirtySecondsSound();
+                    }
+
+                    if (totalSeconds <= 10 && totalSeconds > 0) {
+                        playCountdownBeep();
+                     }
+
+                    if (totalSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        isPaused = false;
+                        
+                        display.classList.add('time-up');
+                        display.textContent = dict[currentLang]['time-up'];
+                        display.style.color = "#e53e3e"; 
+                        
+                        setToggleState('start');
+                        btnToggle.disabled = true;
+                        btnMode.disabled = false;
+
+                        if (currentMode === 'random') {
+                            btnDraw.disabled = false;
+                            document.getElementById('btn-reset-random').disabled = false;
+                        }
+                        if (currentMode === 'custom') {
+                            inputMin.disabled = false;
+                            inputSec.disabled = false;
+                        }
+                        
+                        playEndSound();
+                        autoResetTimeout = setTimeout(function() {
+                            resetTimer();
+                        }, 10000);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            if (autoResetTimeout) clearTimeout(autoResetTimeout); 
+
+            isRunning = false;
+            isPaused = false;
+            
+            totalSeconds = initialTotalSeconds;
+            updateDisplay(totalSeconds);
+            display.classList.remove('time-up');
+            display.style.color = "#1a202c";
+            
+            btnToggle.disabled = (totalSeconds <= 0);
+            setToggleState('start');
+            btnMode.disabled = false;
+            
+            if (currentMode === 'random') {
+                btnDraw.disabled = false;
+                document.getElementById('btn-reset-random').disabled = false;
+            } else if (currentMode === 'custom') {
+                const inputMin = document.getElementById('input-min');
+                const inputSec = document.getElementById('input-sec');
+                inputMin.value = 0;
+                inputSec.value = 0;
+                inputMin.disabled = false;
+                inputSec.disabled = false;
+                
+                totalSeconds = 0;
+                initialTotalSeconds = 0;
+                updateDisplay(0);
+                btnToggle.disabled = true;
+            }
+        }
+
+        // ================= 鍵盤快捷鍵邏輯 =================
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+                    if (e.code === 'Space') return; 
+                }
+                e.preventDefault(); 
+                if (!btnToggle.disabled) {
+                    toggleTimer();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
