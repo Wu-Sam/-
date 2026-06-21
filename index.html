@@ -401,6 +401,9 @@
             </div>
         </div>
         <h5 style="text-align: center;">SN</h5>
+        <button id="installBtn" style="display: none; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 auto;">
+            安裝離線版本
+        </button>
     </div>
 
     <script>
@@ -942,6 +945,55 @@
                 inputSec.disabled = false;
             }
         }
+
+        // ================= PWA 離線版本安裝與隱藏邏輯 =================
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        // 1. 監聽瀏覽器的安裝提示事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 阻止 Android Chrome 預設的自動彈出底欄提示
+            e.preventDefault();
+            // 將事件儲存起來
+            deferredPrompt = e;
+            
+            // 如果目前不是在「已安裝的獨立 App 視窗」模式下，就讓按鈕顯示
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.style.display = 'block';
+            }
+        });
+
+        // 2. 當使用者點擊「安裝離線版本」按鈕時觸發
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            // 初始化音效，順便解鎖 PWA 模式下的 Web Audio
+            if (typeof initAudio === 'function') initAudio();
+            
+            // 跳出瀏覽器原生的安裝確認視窗
+            deferredPrompt.prompt();
+            
+            // 等待使用者按下確認或取消
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`使用者安裝選擇: ${outcome}`);
+            
+            // 清除暫存的提示，並立刻隱藏按鈕
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+
+        // 3. 確保網頁載入時，如果是從桌面圖示打開（獨立視窗），按鈕絕對保持隱藏
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.style.display = 'none';
+            }
+        });
+
+        // 4. 監聽安裝成功事件（當使用者成功安裝到手機或電腦桌面後觸發）
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('WRO RoboSports PWA 已成功安裝！');
+            installBtn.style.display = 'none';
+        });
     </script>
 </body>
 </html>
